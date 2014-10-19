@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+	<window width="1280" height="720" />
+	<haxedef name="FLX_NO_DEBUG" unless="debug" />
+	<haxedef name="FLX_NO_SOUNDTRAY"/>
+
+	<meta title="Remnants2" package="com.example.remnants2" version="1.0.0" company="Company Name" />
+	<app main="Main" path="Export" file="Remnants2" />
+	
+	<source path="Source" />
+
+	<haxelib name="openfl" />
+	<haxelib name="flixel" />
+	<haxelib name="flixel-ui" />
+	<haxelib name="hscript" />
+	
+	<assets path="Assets" rename="assets" exclude="openfl.svg" />
+	<icon path="Assets/openfl.svg" />
+	
+</project>
