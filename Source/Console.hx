@@ -5,9 +5,12 @@ import flixel.addons.ui.FlxUIText;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
+import flixel.input.keyboard.FlxKey;
 import hscript.Expr.Error;
 import hscript.Interp;
 import hscript.Parser;
+import openfl.Assets;
+import openfl.filters.GlowFilter;
 import openfl.text.TextField;
 import openfl.text.TextFieldType;
 import openfl.text.TextFormat;
@@ -28,7 +31,7 @@ class Console extends FlxSpriteGroup
 
 		_inputText = new TextField();
 		_inputText.width = FlxG.width;
-		_inputText.defaultTextFormat = new TextFormat(null, 20);
+		_inputText.defaultTextFormat = new TextFormat(null, 20, 0xFFFFFF);
 		_inputText.type = TextFieldType.INPUT;
 		_inputText.height = 30;
 		_inputText.y = FlxG.height - _inputText.height;
@@ -46,12 +49,14 @@ class Console extends FlxSpriteGroup
 
 		cls();
 		passInReference("C", this);
+		passInReference("I", Inputs);
 		passInReference("FlxSprite", FlxSprite);
+		passInReference("FlxKey", FlxKey);
 	}
 
 	override public function update():Void
 	{
-		if (FlxG.keys.justPressed.NUMPADMINUS) toggleShow();
+		if (FlxG.keys.justPressed.TAB) toggleShow();
 		if (!visible)
 		{
 			FlxG.stage.focus = FlxG.stage;
@@ -68,18 +73,24 @@ class Console extends FlxSpriteGroup
 		_outputText.text += "\n" + _inputText.text;
 		if (_outputText.height > FlxG.height - _inputText.height * 2) _outputText.y = FlxG.height - _inputText.height * 2 - _outputText.height;
 
+		var code:String = _inputText.text;
+		_inputText.text = "";
+
 		try
 		{
-			var prog:Dynamic = _parser.parseString(_inputText.text);
-			_interp.execute(prog);
-		} catch (e:Error) {
+			runCode(code);
+		} catch (e:hscript.Expr.Error) {
 			echo("\nERROR: " + e.getName() + " " + e.getParameters());
 		}
-
-		_inputText.text = "";
 	}
 
-	private function echo(s:String):Void
+	private function runCode(s:String):Void
+	{
+		var prog:Dynamic = _parser.parseString(s);
+		_interp.execute(prog);
+	}
+
+	public function echo(s:String):Void
 	{
 		_outputText.text += "\n" + s;
 	}
@@ -88,6 +99,9 @@ class Console extends FlxSpriteGroup
 	{
 		visible = !visible;
 		_inputText.visible = visible;
+
+		FlxG.state.remove(this, true);
+		FlxG.state.add(this);
 	}
 
 	private function cls():Void
@@ -95,6 +109,11 @@ class Console extends FlxSpriteGroup
 		_outputText.text = "<Console>";
 		_outputText.height = 50;
 		_outputText.y = 0;
+	}
+
+	public function exec(fileName:String):Void
+	{
+		runCode(Assets.getText("assets/cfg/" + fileName + ".cfg"));
 	}
 
 	public function passInReference(s:String, o:Dynamic):Void
