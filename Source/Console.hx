@@ -31,7 +31,7 @@ class Console extends FlxSpriteGroup
 
 		_inputText = new TextField();
 		_inputText.width = FlxG.width;
-		_inputText.defaultTextFormat = new TextFormat(null, 20, 0xFFFFFF);
+		_inputText.defaultTextFormat = new TextFormat(null, 20);
 		_inputText.type = TextFieldType.INPUT;
 		_inputText.height = 30;
 		_inputText.y = FlxG.height - _inputText.height;
@@ -52,6 +52,8 @@ class Console extends FlxSpriteGroup
 		passInReference("I", Inputs);
 		passInReference("FlxSprite", FlxSprite);
 		passInReference("FlxKey", FlxKey);
+
+		scrollFactor.set();
 	}
 
 	override public function update():Void
