@@ -21,10 +21,10 @@ class Player extends FlxSpriteGroup
 		_graphic.makeGraphic(10, 10, model == 0 ? 0xFFFF0000 : 0xFF00FF00);
 		add(_graphic);
 
-		maxVelocity.x = 100;
-		maxVelocity.y = 100;
-		drag.x = maxVelocity.x * 4;
-		drag.y = maxVelocity.y * 4;
+		maxVelocity.x = 500;
+		maxVelocity.y = 500;
+		drag.x = maxVelocity.x * 6;
+		drag.y = maxVelocity.y * 6;
 	}
 
 	public function move(dir:UInt):Void
