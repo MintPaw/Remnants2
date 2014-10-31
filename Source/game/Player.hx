@@ -18,7 +18,7 @@ class Player extends FlxSpriteGroup
 		super();
 
 		_graphic = new FlxSprite();
-		_graphic.makeGraphic(10, 10, 0xFFFF0000);
+		_graphic.makeGraphic(10, 10, model == 0 ? 0xFFFF0000 : 0xFF00FF00);
 		add(_graphic);
 
 		maxVelocity.x = 100;
@@ -40,9 +40,9 @@ class Player extends FlxSpriteGroup
 		acceleration.set();
 
 		if (_left) acceleration.x = -maxVelocity.x * 4;
-		if (_right) acceleration.x = -maxVelocity.x * 4;
-		if (_up) acceleration.x = -maxVelocity.x * 4;
-		if (_down) acceleration.x = -maxVelocity.x * 4;
+		if (_right) acceleration.x = maxVelocity.x * 4;
+		if (_up) acceleration.y = -maxVelocity.x * 4;
+		if (_down) acceleration.y = maxVelocity.x * 4;
 
 		_left = _right = _up = _down = false;
 		super.update();

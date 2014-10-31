@@ -32,10 +32,16 @@ class Inputs
 	{
 		for (i in FlxG.keys.getIsDown())
 		{
-			if (binds.get(i.ID) != null && binds.get(i.ID).indexOf("moveLeft") != -1)
+			if (binds.get(i.ID) != null)
 			{
 				var p:Int = Std.parseInt(binds.get(i.ID).charAt(binds.get(i.ID).length - 1));
-				if (players.members[p] != null) players.members[p].move(FlxObject.LEFT);
+				if (players.members[p] != null)
+				{
+					if (binds.get(i.ID).indexOf("moveLeft") != -1) players.members[p].move(FlxObject.LEFT);
+					if (binds.get(i.ID).indexOf("moveRight") != -1) players.members[p].move(FlxObject.RIGHT);
+					if (binds.get(i.ID).indexOf("moveUp") != -1) players.members[p].move(FlxObject.UP);
+					if (binds.get(i.ID).indexOf("moveDown") != -1) players.members[p].move(FlxObject.DOWN);
+				}
 			}
 		}
 	}

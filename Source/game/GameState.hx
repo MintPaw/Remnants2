@@ -3,7 +3,9 @@ package game;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.math.FlxPoint;
 import mintDungeon.DungeonGenerator;
+import openfl.geom.Point;
 
 class GameState extends flixel.FlxState
 {
@@ -12,6 +14,8 @@ class GameState extends flixel.FlxState
 
 	private var _console:Console;
 	private var _players:FlxTypedGroup<Player>;
+
+	private var _cameraPoint:FlxPoint;
 
 	public function new()
 	{
@@ -37,6 +41,8 @@ class GameState extends flixel.FlxState
 		Inputs.players = _players;
 		
 		dungeon = new DungeonGenerator();
+
+		_cameraPoint = new FlxPoint();
 	}
 
 	private function setupConsole():Void
@@ -65,23 +71,30 @@ class GameState extends flixel.FlxState
 		_players.add(p);
 	}
 
-	private function setCamera(mode:String):Void
-	{
-		if (mode.charAt(0) == "p")
-		{
-			FlxG.camera.follow(_players.members[Std.parseInt(mode.charAt(1))]);
-		} else {
-			_console.echo("Bad camera mode");
-			return;
-		}
-
-		cameraMode = mode;
-	}
-
 	override public function update():Void
 	{
 		Inputs.update();
+		updateCenterPoint();
 
 		super.update();
+	}
+
+	private function updateCenterPoint():Void
+	{
+		var points:Array<Point> = [];
+
+		if (cameraMode == "c")
+		{
+			for (i in _players) points.push(new Point(i.x, i.y));
+
+			var centroid:Point = Reg.centroid(points);
+
+			_cameraPoint.x = centroid.x;
+			_cameraPoint.y = centroid.y;
+		} else if (cameraMode.charAt(0) == "p") {
+			_cameraPoint = _players.members[Std.parseInt(cameraMode.charAt(1))].getMidpoint();
+		}
+
+		FlxG.camera.focusOn(_cameraPoint);
 	}
 }
