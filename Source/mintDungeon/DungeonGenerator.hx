@@ -72,7 +72,7 @@ class DungeonGenerator
 		}
 		
 		map = new FlxTilemap();
-		map.loadMap(s, tileAsset, tileWidth, tileHeight);
+		map.loadMapFromCSV(s, tileAsset, tileWidth, tileHeight);
 		
 		var room:Room = getSquareRoom(Math.round(map.widthInTiles / 2), Math.round(map.heightInTiles / 2), rng.int(minRoomSize, maxRoomSize), rng.int(minRoomSize, maxRoomSize));
 		drawItem(room, GROUND);

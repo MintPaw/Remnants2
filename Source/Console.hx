@@ -10,10 +10,16 @@ import hscript.Expr.Error;
 import hscript.Interp;
 import hscript.Parser;
 import openfl.Assets;
+import openfl.events.Event;
 import openfl.filters.GlowFilter;
+import openfl.net.URLLoader;
+import openfl.net.URLRequest;
+import openfl.text.Font;
 import openfl.text.TextField;
 import openfl.text.TextFieldType;
 import openfl.text.TextFormat;
+
+@:font("assets/font/DroidSans.ttf") class DroidSans extends Font {}
 
 class Console extends FlxSpriteGroup
 {
@@ -31,21 +37,21 @@ class Console extends FlxSpriteGroup
 
 		_inputText = new TextField();
 		_inputText.width = FlxG.width;
-		_inputText.defaultTextFormat = new TextFormat(null, 20);
+		_inputText.defaultTextFormat = new TextFormat("DroidSans", 20);
 		_inputText.type = TextFieldType.INPUT;
 		_inputText.height = 30;
-		_inputText.y = FlxG.height - _inputText.height;
+		_inputText.y = FlxG.stage.stageHeight - _inputText.height;
 
 		_outputText = new FlxUIText(0, 0, FlxG.width, "", 20);
 
 		_outputGraphic = new FlxSprite();
 		_outputGraphic.x = _outputText.x;
 		_outputGraphic.y = _outputText.y;
-		_outputGraphic.makeGraphic(Std.int(_outputText.width), Std.int(FlxG.height - _inputText.height), 0x99000000);
+		_outputGraphic.makeGraphic(Std.int(_outputText.width), Std.int(FlxG.height - _inputText.height * 1.25), 0x99000000);
 		
 		add(_outputGraphic);
 		add(_outputText);
-		FlxG.addChildBelowMouse(_inputText);
+		FlxG.stage.addChild(_inputText);
 
 		cls();
 		passInReference("C", this);
@@ -54,9 +60,10 @@ class Console extends FlxSpriteGroup
 		passInReference("FlxKey", FlxKey);
 
 		scrollFactor.set();
+		_inputText.text = "test";
 	}
 
-	override public function update():Void
+	override public function update(elapsed:Float):Void
 	{
 		if (FlxG.keys.justPressed.TAB) toggleShow();
 		if (!visible)
@@ -67,7 +74,7 @@ class Console extends FlxSpriteGroup
 
 		if (FlxG.keys.justPressed.ENTER) runLine();
 
-		super.update();
+		super.update(elapsed);
 	}
 
 	private function runLine():Void
@@ -118,8 +125,21 @@ class Console extends FlxSpriteGroup
 		runCode(Assets.getText("assets/cfg/" + fileName + ".cfg"));
 	}
 
+	public function loadExec(url:String):Void
+	{
+		var l:URLLoader = new URLLoader();
+		l.addEventListener(Event.COMPLETE, loaderExec);
+		l.load(new URLRequest(url));
+	}
+
 	public function passInReference(s:String, o:Dynamic):Void
 	{
 		_interp.variables.set(s, o);
+	}
+
+	private function loaderExec(e:Event):Void
+	{
+		echo(e.target.data);
+		runCode(e.target.data);
 	}
 }

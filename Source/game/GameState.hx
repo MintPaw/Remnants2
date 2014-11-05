@@ -61,22 +61,22 @@ class GameState extends flixel.FlxState
 		add(dungeon.map);
 	}
 
-	private function createPlayer(model:Int):Void
+	private function createPlayer(model:Int, xpos:Float = -1, ypos:Float = -1):Void
 	{
 		var p:Player = new Player(model);
-		p.x = dungeon.spawnPoint.x * Reg.TILE_SIZE;
-		p.y = dungeon.spawnPoint.y * Reg.TILE_SIZE;
+		p.x = xpos == -1 ? dungeon.spawnPoint.x * Reg.TILE_SIZE : xpos;
+		p.y = ypos == -1 ? dungeon.spawnPoint.y * Reg.TILE_SIZE : ypos;
 		add(p);
 
 		_players.add(p);
 	}
 
-	override public function update():Void
+	override public function update(elapsed:Float):Void
 	{
 		Inputs.update();
 		updateCenterPoint();
 
-		super.update();
+		super.update(elapsed);
 	}
 
 	private function updateCenterPoint():Void

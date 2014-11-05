@@ -35,7 +35,7 @@ class Player extends FlxSpriteGroup
 		if (dir == FlxObject.DOWN) _down = true;
 	}
 
-	override public function update():Void
+	override public function update(elapsed:Float):Void
 	{
 		acceleration.set();
 
@@ -45,6 +45,6 @@ class Player extends FlxSpriteGroup
 		if (_down) acceleration.y = maxVelocity.x * 4;
 
 		_left = _right = _up = _down = false;
-		super.update();
+		super.update(elapsed);
 	}
 }
