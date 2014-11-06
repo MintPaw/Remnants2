@@ -86,12 +86,10 @@ class GameState extends flixel.FlxState
 
 		if (cameraMode == "c")
 		{
-			for (i in _playerGroup) points.push(new FlxPoint(i.x, i.y));
+			for (i in _playerGroup) points.push(i.getMidpoint());
 
-			var centroid:FlxPoint = Reg.centroid(points);
+			cameraPoint = Reg.centroid(points);
 
-			cameraPoint.x = centroid.x;
-			cameraPoint.y = centroid.y;
 		} else if (cameraMode.charAt(0) == "p") {
 			cameraPoint = _playerGroup.members[Std.parseInt(cameraMode.charAt(1))].getMidpoint();
 		}

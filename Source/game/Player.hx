@@ -4,10 +4,8 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 
-class Player extends FlxSpriteGroup
+class Player extends FlxSprite
 {
-	private var _graphic:FlxSprite;
-
 	private var _left:Bool = false;
 	private var _right:Bool = false;
 	private var _up:Bool = false;
@@ -17,9 +15,7 @@ class Player extends FlxSpriteGroup
 	{
 		super();
 
-		_graphic = new FlxSprite();
-		_graphic.makeGraphic(10, 10, model == 0 ? 0xFFFF0000 : 0xFF00FF00);
-		add(_graphic);
+		makeGraphic(10, 10, model == 0 ? 0xFFFF0000 : 0xFF00FF00);
 
 		maxVelocity.x = 500;
 		maxVelocity.y = 500;
