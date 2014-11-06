@@ -5,7 +5,6 @@ import flixel.FlxObject;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
 import mintDungeon.DungeonGenerator;
-import openfl.geom.Point;
 
 class GameState extends flixel.FlxState
 {
@@ -13,9 +12,7 @@ class GameState extends flixel.FlxState
 	public var cameraMode:String = "none";
 
 	private var _console:Console;
-	private var _players:FlxTypedGroup<Player>;
-
-	private var _cameraPoint:FlxPoint;
+	private var _playerGroup:FlxTypedGroup<Player>;
 
 	public function new()
 	{
@@ -37,12 +34,10 @@ class GameState extends flixel.FlxState
 
 	private function setupVars():Void
 	{
-		_players = new FlxTypedGroup<Player>();
-		Inputs.players = _players;
+		_playerGroup = new FlxTypedGroup<Player>();
+		Inputs.players = _playerGroup;
 		
 		dungeon = new DungeonGenerator();
-
-		_cameraPoint = new FlxPoint();
 	}
 
 	private function setupConsole():Void
@@ -68,33 +63,41 @@ class GameState extends flixel.FlxState
 		p.y = ypos == -1 ? dungeon.spawnPoint.y * Reg.TILE_SIZE : ypos;
 		add(p);
 
-		_players.add(p);
+		_playerGroup.add(p);
 	}
 
 	override public function update(elapsed:Float):Void
 	{
 		Inputs.update();
 		updateCenterPoint();
+		updateCollisions();
 
 		super.update(elapsed);
 	}
 
 	private function updateCenterPoint():Void
 	{
-		var points:Array<Point> = [];
+		var points:Array<FlxPoint> = [];
+
+		var cameraPoint:FlxPoint = new FlxPoint(FlxG.camera.x, FlxG.camera.y);
 
 		if (cameraMode == "c")
 		{
-			for (i in _players) points.push(new Point(i.x, i.y));
+			for (i in _playerGroup) points.push(new FlxPoint(i.x, i.y));
 
-			var centroid:Point = Reg.centroid(points);
+			var centroid:FlxPoint = Reg.centroid(points);
 
-			_cameraPoint.x = centroid.x;
-			_cameraPoint.y = centroid.y;
+			cameraPoint.x = centroid.x;
+			cameraPoint.y = centroid.y;
 		} else if (cameraMode.charAt(0) == "p") {
-			_cameraPoint = _players.members[Std.parseInt(cameraMode.charAt(1))].getMidpoint();
+			cameraPoint = _playerGroup.members[Std.parseInt(cameraMode.charAt(1))].getMidpoint();
 		}
 
-		FlxG.camera.focusOn(_cameraPoint);
+		FlxG.camera.focusOn(cameraPoint);
+	}
+
+	private function updateCollisions():Void
+	{
+		FlxG.collide(dungeon.map, _playerGroup);
 	}
 }

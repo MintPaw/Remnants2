@@ -1,6 +1,6 @@
 package ;
 
-import openfl.geom.Point;
+import flixel.math.FlxPoint;
 
 class Reg
 {
@@ -11,9 +11,9 @@ class Reg
 
 	}
 
-	public static function centroid(points:Array<Point>):Point
+	public static function centroid(points:Array<FlxPoint>):FlxPoint
 	{
-		var center:Point = new Point();
+		var center:FlxPoint = new FlxPoint();
 	    for (i in 0...points.length)
 	    {
 	    	center.x += points[i].x;
