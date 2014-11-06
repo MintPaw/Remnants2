@@ -54,6 +54,9 @@ class GameState extends flixel.FlxState
 		dungeon.generate(mapWidth, mapHeight, Reg.TILE_SIZE, Reg.TILE_SIZE, "assets/img/tileset.png");
 		dungeon.map.setTileProperties(1, FlxObject.NONE);
 		add(dungeon.map);
+
+		FlxG.worldBounds.set(0, 0, dungeon.map.width, dungeon.map.height);
+		FlxG.camera.setScrollBoundsRect(0, 0, dungeon.map.width, dungeon.map.height);
 	}
 
 	private function createPlayer(model:Int, xpos:Float = -1, ypos:Float = -1):Void
