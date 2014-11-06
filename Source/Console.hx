@@ -37,7 +37,7 @@ class Console extends FlxSpriteGroup
 
 		_inputText = new TextField();
 		_inputText.width = FlxG.width;
-		_inputText.defaultTextFormat = new TextFormat("DroidSans", 20, 0x555555);
+		_inputText.defaultTextFormat = new TextFormat("DroidSans", 20);
 		_inputText.type = TextFieldType.INPUT;
 		_inputText.height = 30;
 		_inputText.y = FlxG.stage.stageHeight - _inputText.height;
@@ -58,9 +58,9 @@ class Console extends FlxSpriteGroup
 		passInReference("I", Inputs);
 		passInReference("FlxSprite", FlxSprite);
 		passInReference("FlxKey", FlxKey);
-		passInReference("FlxG", FlxKey);
 
 		scrollFactor.set();
+		_inputText.text = "test";
 	}
 
 	override public function update(elapsed:Float):Void
@@ -139,6 +139,7 @@ class Console extends FlxSpriteGroup
 
 	private function loaderExec(e:Event):Void
 	{
+		echo(e.target.data);
 		runCode(e.target.data);
 	}
 }

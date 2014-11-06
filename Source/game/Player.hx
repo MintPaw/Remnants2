@@ -23,8 +23,8 @@ class Player extends FlxSpriteGroup
 
 		maxVelocity.x = 500;
 		maxVelocity.y = 500;
-		drag.x = 5000;
-		drag.y = 5000;
+		drag.x = maxVelocity.x * 6;
+		drag.y = maxVelocity.y * 6;
 	}
 
 	public function move(dir:UInt):Void
