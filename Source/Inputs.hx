@@ -8,7 +8,7 @@ import game.Player;
 class Inputs
 {
 	public static var players:FlxTypedGroup<Player>;
-	public static var binds:Map<Int, String> = new Map<Int, String>();
+	public static var binds:Map<String, String> = new Map<String, String>();
 
 	public static var actions:Array<String> = 
 	[
@@ -23,9 +23,9 @@ class Inputs
 
 	}
 
-	public static function makeBind(key:Int, action:String):Void
+	public static function makeBind(key:String, action:String):Void
 	{
-		binds.set(key, action);
+		binds.set(key.toUpperCase(), action);
 	}
 
 	public static function update():Void
