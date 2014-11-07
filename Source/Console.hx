@@ -11,47 +11,38 @@ import hscript.Interp;
 import hscript.Parser;
 import openfl.Assets;
 import openfl.events.Event;
-import openfl.filters.GlowFilter;
 import openfl.net.URLLoader;
 import openfl.net.URLRequest;
-import openfl.text.Font;
-import openfl.text.TextField;
 import openfl.text.TextFieldType;
-import openfl.text.TextFormat;
-
-@:font("assets/font/DroidSans.ttf") class DroidSans extends Font {}
 
 class Console extends FlxSpriteGroup
 {
 	private var _parser:Parser = new Parser();
 	private var _interp:Interp = new Interp();
 
-	private var _inputText:TextField;
+	private var _inputText:FlxInputText;
 	private var _outputText:FlxUIText;
-	private var _inputGraphic:FlxSprite;
+	private var _inputGraphic:FlxInputText;
 	private var _outputGraphic:FlxSprite;
 
 	public function new()
 	{
 		super();
 
-		_inputText = new TextField();
-		_inputText.width = FlxG.width;
-		_inputText.defaultTextFormat = new TextFormat("DroidSans", 20);
-		_inputText.type = TextFieldType.INPUT;
-		_inputText.height = 30;
-		_inputText.y = FlxG.stage.stageHeight - _inputText.height;
+		_inputText = new FlxInputText();
+		_inputText.textField.type = TextFieldType.INPUT;
+		_inputText.y = FlxG.height - _inputText.textField.textHeight * 2;
+		add(_inputText);
 
-		_outputText = new FlxUIText(0, 0, FlxG.width, "", 20);
+		_outputText = new FlxUIText(0, 0, FlxG.width, "");
 
 		_outputGraphic = new FlxSprite();
 		_outputGraphic.x = _outputText.x;
 		_outputGraphic.y = _outputText.y;
-		_outputGraphic.makeGraphic(Std.int(_outputText.width), Std.int(FlxG.height - _inputText.height * 1.25), 0x99000000);
+		_outputGraphic.makeGraphic(Std.int(_outputText.width), FlxG.height, 0x99000000);
 		
 		add(_outputGraphic);
 		add(_outputText);
-		FlxG.stage.addChild(_inputText);
 
 		cls();
 		passInReference("C", this);
@@ -60,17 +51,11 @@ class Console extends FlxSpriteGroup
 		passInReference("FlxKey", FlxKey);
 
 		scrollFactor.set();
-		_inputText.text = "test";
 	}
 
 	override public function update(elapsed:Float):Void
 	{
 		if (FlxG.keys.justPressed.TAB) toggleShow();
-		if (!visible)
-		{
-			FlxG.stage.focus = FlxG.stage;
-			return;
-		}
 
 		if (FlxG.keys.justPressed.ENTER) runLine();
 
@@ -84,6 +69,7 @@ class Console extends FlxSpriteGroup
 
 		var code:String = _inputText.text;
 		_inputText.text = "";
+		_inputText.caretIndex = 0;
 
 		try
 		{
@@ -108,6 +94,9 @@ class Console extends FlxSpriteGroup
 	{
 		visible = !visible;
 		_inputText.visible = visible;
+
+		_inputText.hasFocus = visible;
+		_inputText.text = _inputText.text.split(String.fromCharCode(9)).join("");
 
 		FlxG.state.remove(this, true);
 		FlxG.state.add(this);
