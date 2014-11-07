@@ -14,9 +14,7 @@ class Main extends Sprite
 	{
 		super();
 
-		stage.quality = StageQuality.LOW;
-
-		var flixel:FlxGame = new FlxGame(1920, 1080, MainState, 1, 60, 60, true, false);
+		var flixel:FlxGame = new FlxGame(640, 360, MainState, 1, 60, 60, true, false);
 		addChild(flixel);
 	}
 }
