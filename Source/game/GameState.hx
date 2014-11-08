@@ -71,24 +71,22 @@ class GameState extends flixel.FlxState
 	override public function update(elapsed:Float):Void
 	{
 		Inputs.update();
-		updateCenterPoint();
-		updateCollisions();
+		updateCamera();
 
 		super.update(elapsed);
+		
+		updateCollisions();
 	}
 
-	private function updateCenterPoint():Void
+	private function updateCamera():Void
 	{
 		var points:Array<FlxPoint> = [];
-
 		var cameraPoint:FlxPoint = new FlxPoint(FlxG.camera.x, FlxG.camera.y);
 
 		if (cameraMode == "c")
 		{
 			for (i in _playerGroup) points.push(i.getMidpoint());
-
 			cameraPoint = Reg.centroid(points);
-
 		} else if (cameraMode.charAt(0) == "p") {
 			cameraPoint = _playerGroup.members[Std.parseInt(cameraMode.charAt(1))].getMidpoint();
 		}
