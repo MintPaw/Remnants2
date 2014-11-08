@@ -19,6 +19,12 @@ class MainState extends FlxState
 		FlxG.sound.soundTrayEnabled = false;
 		DungeonGenerator.init(Std.int(Math.random() * 10000));
 
+		#if flash
+		Inputs.setPlatform("windows");
+		#end
+
+		FlxG.gamepads.globalDeadZone = .8;
+
 		FlxG.switchState(new GameState());
 	}
 }

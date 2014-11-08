@@ -17,10 +17,10 @@ class Player extends FlxSprite
 
 		makeGraphic(10, 10, model == 0 ? 0xFFFF0000 : 0xFF00FF00);
 
-		maxVelocity.x = 500;
-		maxVelocity.y = 500;
-		drag.x = maxVelocity.x * 6;
-		drag.y = maxVelocity.y * 6;
+		maxVelocity.x = 300;
+		maxVelocity.y = 300;
+		drag.x = 5000;
+		drag.y = 5000;
 	}
 
 	public function move(dir:UInt):Void
@@ -35,10 +35,10 @@ class Player extends FlxSprite
 	{
 		acceleration.set();
 
-		if (_left) acceleration.x = -maxVelocity.x * 4;
-		if (_right) acceleration.x = maxVelocity.x * 4;
-		if (_up) acceleration.y = -maxVelocity.x * 4;
-		if (_down) acceleration.y = maxVelocity.x * 4;
+		if (_left) acceleration.x = -maxVelocity.x * 8;
+		if (_right) acceleration.x = maxVelocity.x * 8;
+		if (_up) acceleration.y = -maxVelocity.x * 8;
+		if (_down) acceleration.y = maxVelocity.x * 8;
 
 		_left = _right = _up = _down = false;
 		super.update(elapsed);
