@@ -30,6 +30,7 @@ class GameState extends flixel.FlxState
 	{
 		setupVars();
 		setupConsole();
+		_console.exec("autoexecgame");
 	}
 
 	private function setupVars():Void
@@ -45,8 +46,6 @@ class GameState extends flixel.FlxState
 		_console = new Console();
 		_console.passInReference("G", this);
 		add(_console);
-
-		_console.exec("autoexecgame");
 	}
 
 	private function generateMap(mapWidth:Float, mapHeight:Float):Void

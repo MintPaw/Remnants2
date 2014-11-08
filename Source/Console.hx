@@ -13,14 +13,17 @@ import openfl.Assets;
 import openfl.events.Event;
 import openfl.net.URLLoader;
 import openfl.net.URLRequest;
+import openfl.text.Font;
+import openfl.text.TextField;
 import openfl.text.TextFieldType;
+import openfl.text.TextFormat;
 
 class Console extends FlxSpriteGroup
 {
 	private var _parser:Parser = new Parser();
 	private var _interp:Interp = new Interp();
 
-	private var _inputText:FlxInputText;
+	private var _inputText:TextField;
 	private var _outputText:FlxUIText;
 	private var _inputGraphic:FlxInputText;
 	private var _outputGraphic:FlxSprite;
@@ -29,10 +32,16 @@ class Console extends FlxSpriteGroup
 	{
 		super();
 
-		_inputText = new FlxInputText();
-		_inputText.textField.type = TextFieldType.INPUT;
-		_inputText.y = FlxG.height - _inputText.textField.textHeight * 2;
-		add(_inputText);
+		_inputText = new TextField();
+		_inputText.defaultTextFormat = new TextFormat(Assets.getFont("assets/font/DroidSans.ttf").fontName, 20);
+		_inputText.type = TextFieldType.INPUT;
+		_inputText.border = true;
+		_inputText.backgroundColor = 0x555555;
+		_inputText.background = true;
+		_inputText.width = FlxG.stage.stageWidth;
+		_inputText.height = 30;
+		_inputText.y = FlxG.stage.stageHeight - _inputText.height - 2;
+		FlxG.addChildBelowMouse(_inputText);
 
 		_outputText = new FlxUIText(0, 0, FlxG.width, "");
 
@@ -45,6 +54,7 @@ class Console extends FlxSpriteGroup
 		add(_outputText);
 
 		cls();
+		toggleShow();
 		passInReference("C", this);
 		passInReference("I", Inputs);
 		passInReference("FlxSprite", FlxSprite);
@@ -69,7 +79,6 @@ class Console extends FlxSpriteGroup
 
 		var code:String = _inputText.text;
 		_inputText.text = "";
-		_inputText.caretIndex = 0;
 
 		try
 		{
@@ -95,7 +104,8 @@ class Console extends FlxSpriteGroup
 		visible = !visible;
 		_inputText.visible = visible;
 
-		_inputText.hasFocus = visible;
+		FlxG.stage.focus = visible ? _inputText : FlxG.stage;
+
 		_inputText.text = _inputText.text.split(String.fromCharCode(9)).join("");
 
 		FlxG.state.remove(this, true);
@@ -128,7 +138,6 @@ class Console extends FlxSpriteGroup
 
 	private function loaderExec(e:Event):Void
 	{
-		echo(e.target.data);
 		runCode(e.target.data);
 	}
 }
