@@ -1,27 +1,14 @@
 package mintDungeon;
-import flixel.math.FlxPoint;
-import mintDungeon.DungeonGenerator.Enemy;
 
-/**
- * ...
- * @author MintPaw
- */
-class Room extends Item
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+
+class Room extends DrawableObject
 {
-	public var outline:Array<FlxPoint> = [];
-	public var enemies:Array<Enemy> = [];
-	
-	public var safe:Bool = false;
-	
-	public function new() 
+	public var location:Rectangle = new Rectangle();
+
+	public function new()
 	{
 		super();
 	}
-	
-	public function hasMiniBoss():Bool
-	{
-		if (enemies.length == 0) return false;
-		return enemies[0].level == 4;
-	}
-	
 }

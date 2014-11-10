@@ -3,7 +3,6 @@ package ;
 import flixel.FlxG;
 import flixel.FlxState;
 import game.GameState;
-import mintDungeon.DungeonGenerator;
 
 class MainState extends FlxState
 {
@@ -17,7 +16,6 @@ class MainState extends FlxState
 	{
 		FlxG.cameras.bgColor = 0xFFFFFFFF;
 		FlxG.sound.soundTrayEnabled = false;
-		DungeonGenerator.init(Std.int(Math.random() * 10000));
 
 		#if flash
 		Inputs.setPlatform("windows");

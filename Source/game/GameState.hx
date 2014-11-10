@@ -4,14 +4,17 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
-import mintDungeon.DungeonGenerator;
+import flixel.tile.FlxTilemap;
+import mintDungeon.Generator;
+import openfl.Assets;
 
 class GameState extends flixel.FlxState
 {
-	public var dungeon:DungeonGenerator;
+	public var generator:Generator;
 	public var cameraMode:String = "none";
 
 	private var _console:Console;
+	private var _map:FlxTilemap;
 	private var _playerGroup:FlxTypedGroup<Player>;
 
 	public function new()
@@ -38,7 +41,7 @@ class GameState extends flixel.FlxState
 		_playerGroup = new FlxTypedGroup<Player>();
 		Inputs.players = _playerGroup;
 		
-		dungeon = new DungeonGenerator();
+		generator = new Generator(0);
 	}
 
 	private function setupConsole():Void
@@ -48,21 +51,24 @@ class GameState extends flixel.FlxState
 		add(_console);
 	}
 
-	private function generateMap(mapWidth:Float, mapHeight:Float):Void
+	private function generateMap():Void
 	{
-		dungeon.generate(mapWidth, mapHeight, Reg.TILE_SIZE, Reg.TILE_SIZE, "assets/img/tileset.png");
-		dungeon.map.setTileProperties(1, FlxObject.NONE);
-		add(dungeon.map);
+		generator.generate();
+		_map = new FlxTilemap();
+		_map.loadMapFromCSV(generator.getMapAsCSV(), "assets/img/tileset.png", Reg.TILE_SIZE, Reg.TILE_SIZE);
 
-		FlxG.worldBounds.set(0, 0, dungeon.map.width, dungeon.map.height);
-		FlxG.camera.setScrollBoundsRect(0, 0, dungeon.map.width, dungeon.map.height);
+		_map.setTileProperties(1, FlxObject.NONE);
+		add(_map);
+
+		FlxG.worldBounds.set(0, 0, _map.width, _map.height);
+		FlxG.camera.setScrollBoundsRect(0, 0, _map.width, _map.height);
 	}
 
 	private function createPlayer(model:Int, xpos:Float = -1, ypos:Float = -1):Void
 	{
 		var p:Player = new Player(model);
-		p.x = xpos == -1 ? dungeon.spawnPoint.x * Reg.TILE_SIZE : xpos;
-		p.y = ypos == -1 ? dungeon.spawnPoint.y * Reg.TILE_SIZE : ypos;
+		p.x = xpos == -1 ? generator.spawnPoint.x * Reg.TILE_SIZE : xpos;
+		p.y = ypos == -1 ? generator.spawnPoint.y * Reg.TILE_SIZE : ypos;
 		add(p);
 
 		_playerGroup.add(p);
@@ -96,6 +102,6 @@ class GameState extends flixel.FlxState
 
 	private function updateCollisions():Void
 	{
-		FlxG.collide(dungeon.map, _playerGroup);
+		FlxG.collide(_map, _playerGroup);
 	}
 }
