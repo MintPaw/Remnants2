@@ -70,6 +70,7 @@ class GameState extends flixel.FlxState
 		p.x = xpos == -1 ? generator.spawnPoint.x * Reg.TILE_SIZE : xpos;
 		p.y = ypos == -1 ? generator.spawnPoint.y * Reg.TILE_SIZE : ypos;
 		add(p);
+		add(p.aimer);
 
 		_playerGroup.add(p);
 	}

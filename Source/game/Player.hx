@@ -11,6 +11,8 @@ class Player extends FlxSprite
 	private var _up:Bool = false;
 	private var _down:Bool = false;
 
+	public var aimer:FlxSprite;
+
 	public function new(model:Int)
 	{
 		super();
@@ -21,6 +23,9 @@ class Player extends FlxSprite
 		maxVelocity.y = 300;
 		drag.x = 5000;
 		drag.y = 5000;
+
+		aimer = new FlxSprite();
+		aimer.makeGraphic(2, 2, 0xFF999999);
 	}
 
 	public function move(dir:UInt):Void
@@ -40,7 +45,18 @@ class Player extends FlxSprite
 		if (_up) acceleration.y = -maxVelocity.x * 8;
 		if (_down) acceleration.y = maxVelocity.x * 8;
 
-		_left = _right = _up = _down = false;
 		super.update(elapsed);
+
+		aimer.x = x + width / 2 - aimer.width / 2;
+		aimer.y = y + height / 2 - aimer.height / 2;
+
+		if (_left) aimer.x = x - width / 2;
+		if (_right) aimer.x = x + width + aimer.width;
+		if (_up) aimer.y = y - height / 2;
+		if (_down) aimer.y = y + height + aimer.height;
+
+		aimer.visible = _left || _right || _up || _down;
+
+		_left = _right = _up = _down = false;
 	}
 }
