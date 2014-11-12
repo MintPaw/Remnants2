@@ -25,7 +25,6 @@ class GameState extends flixel.FlxState
 	override public function create():Void
 	{
 		super.create();
-
 		setup();
 	}
 

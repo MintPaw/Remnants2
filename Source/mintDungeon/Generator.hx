@@ -1,5 +1,8 @@
 package mintDungeon;
 
+import flixel.FlxObject;
+import flixel.math.FlxPoint;
+import flixel.tile.FlxTilemap;
 import mintDungeon.DrawableObject;
 import mintDungeon.Hallway;
 import mintDungeon.Random;
@@ -14,8 +17,10 @@ class Generator
 	public static var UP:Int = 2;
 	public static var DOWN:Int = 3;
 
-	public static var WALL:Int = 2;
 	public static var GROUND:Int = 1;
+	public static var WALL:Int = 2;
+	public static var DOOR:Int = 3;
+	public static var KEY:Int = 4;
 	public static var OFF_MAP:Int = 98;
 	public static var DEBUG:Int = 99;
 
@@ -23,10 +28,17 @@ class Generator
 	public var roomSize:Point = new Point();
 	public var roomAmount:Point = new Point();
 	public var hallLength:Point = new Point();
+	public var doorPercentage:Point = new Point();
 
 	public var spawnPoint:Point = new Point();
+	public var keys:Array<Point>;
+	public var doors:Array<Point>;
 
 	private var _mapArray:Array<Array<Int>>;
+
+
+	private var _hallways:Array<Hallway>;
+	private var _rooms:Array<Room>;
 
 	private var _tryAgain:Bool;
 	private var _tries:Int;
@@ -45,9 +57,14 @@ class Generator
 			_tryAgain = false;
 			_tries = 0;
 			_mapArray = [];
+			_rooms = [];
+			_hallways = [];
+			keys = [];
+			doors = [];
 
 			generateEmptyMap();
 			generateRooms();
+			generateDoors();
 		}
 	}
 
@@ -68,7 +85,7 @@ class Generator
 		var startRoom:Room = generateStartingRoom();
 		drawObject(startRoom);
 
-		var roomsToGenerate:Int = Random.minMaxInt(roomAmount.x, roomAmount.x) - 1;
+		var roomsToGenerate:Int = Random.minMaxInt(roomAmount.x, roomAmount.y) - 1;
 
 		var room:Room;
 		var hall:Hallway;
@@ -97,50 +114,144 @@ class Generator
 
 			drawObject(room);
 			drawObject(hall);
+
+			_rooms.push(room);
+			_hallways.push(hall);
 		}
+	}
+
+	private function generateDoors():Void
+	{
+		while(true)
+		{
+			for (i in doors) setTile(i.x, i.y, GROUND);
+			for (i in keys) setTile(i.x, i.y, GROUND);
+			doors = [];
+			keys = [];
+
+			var absDoorPerc:Int = Random.minMaxInt(doorPercentage.x, doorPercentage.y);
+			var doorsToCreate:Int = Math.round(_hallways.length * absDoorPerc / 100);
+
+			for (i in 0...doorsToCreate)
+			{
+				var currentCSV:String = getMapAsCSV();
+				while (true)
+				{
+					var doorLoc:Point;
+					while (true)
+					{
+						var badDoorPos:Bool = false;
+						doorLoc = _hallways[Random.minMaxInt(0, _hallways.length - 1)].endPoint.clone();
+						
+						for (i in doors) if (i.x == doorLoc.x && i.y == doorLoc.y) badDoorPos = true;
+
+						if (!badDoorPos) break;
+					}
+
+					var keyLoc:Point = new Point();
+
+					while(true)
+					{
+						keyLoc.setTo(Random.minMaxInt(1, mapSizeInTiles.x - 1), Random.minMaxInt(1, mapSizeInTiles.y - 1));
+						if (getTile(keyLoc.x, keyLoc.y) == GROUND && !keyLoc.equals(spawnPoint)) break;
+					}
+
+					if (isReachable(spawnPoint, keyLoc, currentCSV, doorLoc))
+					{
+						setTile(keyLoc.x, keyLoc.y, KEY);
+						setTile(doorLoc.x, doorLoc.y, DOOR);
+						keys.push(keyLoc); 
+						doors.push(doorLoc); 
+						break;
+					}
+				}
+			}
+
+			//for (i in 0...100) checkKeyDoor();
+			if (checkKeyDoor()) break;
+		}
+	}
+
+	private function checkKeyDoor():Bool
+	{
+		var keysSeen:Int = 0;
+		var visibleKeys:Int = 0;
+
+		for (i in doors)
+		{
+			var currentCSV:String = getMapAsCSV();
+			visibleKeys = 0;
+
+			for (j in keys)
+			{
+				if (isReachable(spawnPoint, j, currentCSV)) visibleKeys++;
+			}
+
+			if (visibleKeys == keys.length) return true;
+			if (visibleKeys <= keysSeen) return false;
+			keysSeen = visibleKeys;
+
+
+			var doorToRem:Point = doors[Random.minMaxInt(0, doors.length - 1)];
+			setTile(doorToRem.x, doorToRem.y, GROUND);
+		}
+
+		for (i in doors) setTile(i.x, i.y, DOOR);
+
+		return true;
+	}
+
+	private function isReachable(start:Point, end:Point, csv:String, doorToAdd:Point = null):Bool
+	{
+		var map:FlxTilemap = new FlxTilemap();
+		map.loadMapFromCSV(csv, "assets/empty.png", 1, 1);
+		map.setTileProperties(DOOR, FlxObject.ANY);
+		map.setTileProperties(GROUND, FlxObject.NONE);
+		map.setTileProperties(KEY, FlxObject.NONE);
+
+		if (doorToAdd != null) map.setTile(Std.int(doorToAdd.x), Std.int(doorToAdd.y), DOOR);
+
+		var path:Array<FlxPoint> = map.findPath(new FlxPoint(Std.int(start.x), Std.int(start.y)), new FlxPoint(Std.int(end.x), Std.int(end.y)));
+
+		return path != null;
 	}
 
 	private function generateHallway():Hallway
 	{
 		var hall:Hallway;
 
+		hall = new Hallway();
+		var startingWall:Point = new Point();
+
 		while (true)
 		{
-			tried();
-
-			hall = new Hallway();
-			var startingWall:Point = new Point();
-
-			while (true)
+			startingWall.setTo(Random.minMaxInt(1, mapSizeInTiles.x - 1), Random.minMaxInt(0, mapSizeInTiles.y - 1));
+			if (getTile(startingWall.x, startingWall.y) == GROUND)
 			{
-				startingWall.setTo(Random.minMaxInt(1, mapSizeInTiles.x - 1), Random.minMaxInt(0, mapSizeInTiles.y - 1));
-				if (getTile(startingWall.x, startingWall.y) == GROUND)
-				{
-					if (
-						getTile(startingWall.x + 1, startingWall.y) == WALL ||
-						getTile(startingWall.x - 1, startingWall.y) == WALL ||
-						getTile(startingWall.x, startingWall.y + 1) == WALL ||
-						getTile(startingWall.x, startingWall.y - 1) == WALL || _tryAgain) break;
-				}
+				if (
+					getTile(startingWall.x + 1, startingWall.y) == WALL ||
+					getTile(startingWall.x - 1, startingWall.y) == WALL ||
+					getTile(startingWall.x, startingWall.y + 1) == WALL ||
+					getTile(startingWall.x, startingWall.y - 1) == WALL || _tryAgain) break;
 			}
-
-			var direction:Int = Random.minMaxInt(0, 3);
-			var length:Int = Random.minMaxInt(hallLength.x, hallLength.y) + 1;
-			hall.direction = direction;
-
-			for (i in 1...length)
-			{
-				if (direction == LEFT)  hall.tiles.push(new Point(startingWall.x - i, startingWall.y));
-				if (direction == RIGHT)  hall.tiles.push(new Point(startingWall.x + i, startingWall.y));
-				if (direction == UP)  hall.tiles.push(new Point(startingWall.x, startingWall.y - i));
-				if (direction == DOWN)  hall.tiles.push(new Point(startingWall.x, startingWall.y + i));
-			}
-
-			hall.startPoint = hall.tiles.shift();
-			hall.endPoint = hall.tiles[hall.tiles.length - 1];
-
-			return hall;
 		}
+
+		var direction:Int = Random.minMaxInt(0, 3);
+		var length:Int = Random.minMaxInt(hallLength.x, hallLength.y) + 1;
+		hall.direction = direction;
+
+		for (i in 1...length)
+		{
+			if (direction == LEFT)  hall.tiles.push(new Point(startingWall.x - i, startingWall.y));
+			if (direction == RIGHT)  hall.tiles.push(new Point(startingWall.x + i, startingWall.y));
+			if (direction == UP)  hall.tiles.push(new Point(startingWall.x, startingWall.y - i));
+			if (direction == DOWN)  hall.tiles.push(new Point(startingWall.x, startingWall.y + i));
+		}
+
+		hall.startPoint = hall.tiles.shift();
+		hall.endPoint = hall.tiles[hall.tiles.length - 1];
+
+		return hall;
 	}
 
 	private function generateStartingRoom():Room
@@ -156,24 +267,19 @@ class Generator
 
 	private function generateRoom(x:Int, y:Int, width:Int, height:Int):Room
 	{
-		while(true)
+		var room:Room = new Room();
+
+		room.location.setTo(x, y, width, height);
+
+		for (i in 0...Std.int(height))
 		{
-			tried();
-
-			var room:Room = new Room();
-
-			room.location.setTo(x, y, width, height);
-
-			for (i in 0...Std.int(height))
+			for (j in 0...Std.int(width))
 			{
-				for (j in 0...Std.int(width))
-				{
-					room.tiles.push(new Point(x + j, y + i));
-				}
+				room.tiles.push(new Point(x + j, y + i));
 			}
-
-			return room;
 		}
+
+		return room;
 	}
 
 	public function getMapAsString():String
@@ -213,9 +319,13 @@ class Generator
 			{
 				if (_mapArray[i][j] == WALL) b.setPixel(j, i, 0x000000);
 				if (_mapArray[i][j] == GROUND) b.setPixel(j, i, 0xFFFFFF);
+				if (_mapArray[i][j] == KEY) b.setPixel(j, i, 0x55FF55);
+				if (_mapArray[i][j] == DOOR) b.setPixel(j, i, 0x440000);
 				if (_mapArray[i][j] == DEBUG) b.setPixel(j, i, 0xFF0000);
 			}
 		}
+
+		b.setPixel(Std.int(spawnPoint.x), Std.int(spawnPoint.y), 0x0000FF);
 
 		return new Bitmap(b);
 	}
@@ -256,5 +366,19 @@ class Generator
 	private function tried():Void
 	{
 		if (_tries++ > 1000) _tryAgain = true;
+	}
+
+	public function shuffleArray(input:Array<Dynamic>):Void
+	{
+		var i:Int = input.length - 1;
+
+		while (i >= 0)
+		{
+			var randomIndex:Int = Math.floor(Math.random()*(i+1));
+			var itemAtIndex:Dynamic = input[randomIndex];
+			input[randomIndex] = input[i];
+			input[i] = itemAtIndex;
+			i--;
+		}
 	}
 }
