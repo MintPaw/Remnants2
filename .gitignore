@@ -44,11 +44,8 @@ Temporary Items
 .apdisk
 
 # Exports
-Export/emscripten
-Export/flash/haxe
-Export/flash/obj
-Export/linux/cpp/haxe
-Export/linux/cpp/obj
-Export/linux/neko/haxe
-Export/linux/neko/obj
-Export/html5/haxe
+Export/flash/haxe/
+Export/flash/obj/
+Export/html5/
+Export/linux/
+Export/windows/

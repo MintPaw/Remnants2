@@ -24,7 +24,11 @@ class Inputs
 	"moveLeft0", 
 	"moveRight0", 
 	"moveUp0", 
-	"moveDown0"
+	"moveDown0", 
+	"moveLeft1", 
+	"moveRight1", 
+	"moveUp1", 
+	"moveDown1"
 	];
 
 	public function new()
