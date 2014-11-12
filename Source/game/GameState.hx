@@ -16,6 +16,8 @@ class GameState extends flixel.FlxState
 	private var _console:Console;
 	private var _map:FlxTilemap;
 	private var _playerGroup:FlxTypedGroup<Player>;
+	private var _doorGroup:FlxTypedGroup<Door>;
+	private var _keyGroup:FlxTypedGroup<Key>;
 
 	public function new()
 	{
@@ -38,6 +40,8 @@ class GameState extends flixel.FlxState
 	private function setupVars():Void
 	{
 		_playerGroup = new FlxTypedGroup<Player>();
+		_doorGroup = new FlxTypedGroup<Door>();
+		_keyGroup = new FlxTypedGroup<Key>();
 		Inputs.players = _playerGroup;
 		
 		generator = new Generator(0);
@@ -61,6 +65,28 @@ class GameState extends flixel.FlxState
 
 		FlxG.worldBounds.set(0, 0, _map.width, _map.height);
 		FlxG.camera.setScrollBoundsRect(0, 0, _map.width, _map.height);
+
+		for (xi in 0..._map.widthInTiles)
+		{
+			for (yi in 0..._map.heightInTiles)
+			{
+				if (_map.getTile(xi, yi) == Generator.DOOR)
+				{
+					var d:Door = new Door(xi * Reg.TILE_SIZE, yi * Reg.TILE_SIZE);
+					_doorGroup.add(d);
+					add(d);
+					_map.setTile(xi, yi, Generator.GROUND);
+				}
+
+				if (_map.getTile(xi, yi) == Generator.KEY)
+				{
+					var k:Key = new Key(xi * Reg.TILE_SIZE, yi * Reg.TILE_SIZE);
+					_keyGroup.add(k);
+					add(k);
+					_map.setTile(xi, yi, Generator.GROUND);
+				}
+			}
+		}
 	}
 
 	private function createPlayer(model:Int, xpos:Float = -1, ypos:Float = -1):Void
