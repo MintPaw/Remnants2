@@ -3,11 +3,10 @@ package game;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
-import game.Key;
 
 class Player extends FlxSprite
 {
-	public var keys:Array<Key> = [];
+	public var keys:Array<Int> = [];
 
 	private var _left:Bool = false;
 	private var _right:Bool = false;
@@ -54,9 +53,9 @@ class Player extends FlxSprite
 		aimer.y = y + height / 2 - aimer.height / 2;
 
 		if (_left) aimer.x = x - width / 2;
-		if (_right) aimer.x = x + width + aimer.width;
+		if (_right) aimer.x = x + width + aimer.width * 2;
 		if (_up) aimer.y = y - height / 2;
-		if (_down) aimer.y = y + height + aimer.height;
+		if (_down) aimer.y = y + height + aimer.height * 2;
 
 		aimer.visible = _left || _right || _up || _down;
 

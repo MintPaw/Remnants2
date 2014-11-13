@@ -71,16 +71,14 @@ class GameState extends flixel.FlxState
 
 		for (i in generator.doors)
 		{
-			var d:game.Door = new game.Door(i.x * Reg.TILE_SIZE, i.y * Reg.TILE_SIZE);
-			d.colour = i.colour;
+			var d:game.Door = new game.Door(i.x * Reg.TILE_SIZE, i.y * Reg.TILE_SIZE, i.colour);
 			_doorGroup.add(d);
 			add(d);
 		}
 
 		for (i in generator.keys)
 		{
-			var k:game.Key = new game.Key(i.x * Reg.TILE_SIZE, i.y * Reg.TILE_SIZE);
-			k.colour = i.colour;
+			var k:game.Key = new game.Key(i.x * Reg.TILE_SIZE, i.y * Reg.TILE_SIZE, i.colour);
 			_keyGroup.add(k);
 			add(k);
 		}
@@ -125,19 +123,32 @@ class GameState extends flixel.FlxState
 
 	private function updateCollisions():Void
 	{
-		FlxG.collide(_keyGroup, _playerGroup, keyVSPlayer);
+		FlxG.overlap(_keyGroup, _playerGroup, keyVSPlayer);
 		FlxG.collide(_doorGroup, _playerGroup, doorVSPlayer);
 		FlxG.collide(_map, _playerGroup);
 	}
 
 	private function keyVSPlayer(b1:FlxBasic, b2:FlxBasic):Void
 	{
-		//var key:game.Key = cast(b1, game.Key);
-		//key.
+		var k:game.Key = cast(b1, game.Key);
+		var p:Player = cast(b2, Player);
+		p.keys.push(k.colour);
+		k.kill();
 	}
 
 	private function doorVSPlayer(b1:FlxBasic, b2:FlxBasic):Void
 	{
-
+		var d:game.Door = cast(b1, game.Door);
+		var p:Player = cast(b2, Player);
+		
+		for (i in p.keys)
+		{
+			if (i == d.colour)
+			{
+				d.kill();
+				p.keys.splice(p.keys.indexOf(i), 1);
+				return;
+			}
+		}
 	}
 }
