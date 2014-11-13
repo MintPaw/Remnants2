@@ -1,10 +1,13 @@
 package game;
 
+import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
+import game.Door;
+import game.Key;
 import mintDungeon.Generator;
 import openfl.Assets;
 
@@ -16,8 +19,8 @@ class GameState extends flixel.FlxState
 	private var _console:Console;
 	private var _map:FlxTilemap;
 	private var _playerGroup:FlxTypedGroup<Player>;
-	private var _doorGroup:FlxTypedGroup<Door>;
-	private var _keyGroup:FlxTypedGroup<Key>;
+	private var _doorGroup:FlxTypedGroup<game.Door>;
+	private var _keyGroup:FlxTypedGroup<game.Key>;
 
 	public function new()
 	{
@@ -40,8 +43,8 @@ class GameState extends flixel.FlxState
 	private function setupVars():Void
 	{
 		_playerGroup = new FlxTypedGroup<Player>();
-		_doorGroup = new FlxTypedGroup<Door>();
-		_keyGroup = new FlxTypedGroup<Key>();
+		_doorGroup = new FlxTypedGroup<game.Door>();
+		_keyGroup = new FlxTypedGroup<game.Key>();
 		Inputs.players = _playerGroup;
 		
 		generator = new Generator(0);
@@ -66,26 +69,20 @@ class GameState extends flixel.FlxState
 		FlxG.worldBounds.set(0, 0, _map.width, _map.height);
 		FlxG.camera.setScrollBoundsRect(0, 0, _map.width, _map.height);
 
-		for (xi in 0..._map.widthInTiles)
+		for (i in generator.doors)
 		{
-			for (yi in 0..._map.heightInTiles)
-			{
-				if (_map.getTile(xi, yi) == Generator.DOOR)
-				{
-					var d:Door = new Door(xi * Reg.TILE_SIZE, yi * Reg.TILE_SIZE);
-					_doorGroup.add(d);
-					add(d);
-					_map.setTile(xi, yi, Generator.GROUND);
-				}
+			var d:game.Door = new game.Door(i.x * Reg.TILE_SIZE, i.y * Reg.TILE_SIZE);
+			d.colour = i.colour;
+			_doorGroup.add(d);
+			add(d);
+		}
 
-				if (_map.getTile(xi, yi) == Generator.KEY)
-				{
-					var k:Key = new Key(xi * Reg.TILE_SIZE, yi * Reg.TILE_SIZE);
-					_keyGroup.add(k);
-					add(k);
-					_map.setTile(xi, yi, Generator.GROUND);
-				}
-			}
+		for (i in generator.keys)
+		{
+			var k:game.Key = new game.Key(i.x * Reg.TILE_SIZE, i.y * Reg.TILE_SIZE);
+			k.colour = i.colour;
+			_keyGroup.add(k);
+			add(k);
 		}
 	}
 
@@ -128,6 +125,19 @@ class GameState extends flixel.FlxState
 
 	private function updateCollisions():Void
 	{
+		FlxG.collide(_keyGroup, _playerGroup, keyVSPlayer);
+		FlxG.collide(_doorGroup, _playerGroup, doorVSPlayer);
 		FlxG.collide(_map, _playerGroup);
+	}
+
+	private function keyVSPlayer(b1:FlxBasic, b2:FlxBasic):Void
+	{
+		//var key:game.Key = cast(b1, game.Key);
+		//key.
+	}
+
+	private function doorVSPlayer(b1:FlxBasic, b2:FlxBasic):Void
+	{
+
 	}
 }

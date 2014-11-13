@@ -3,9 +3,12 @@ package game;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
+import game.Key;
 
 class Player extends FlxSprite
 {
+	public var keys:Array<Key> = [];
+
 	private var _left:Bool = false;
 	private var _right:Bool = false;
 	private var _up:Bool = false;
