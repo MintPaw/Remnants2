@@ -4,6 +4,8 @@ import flixel.math.FlxPoint;
 
 class Reg
 {
+	public static var currentLevel:Int;
+
 	public static var TILE_SIZE:Int = 40;
 
 	public function new()

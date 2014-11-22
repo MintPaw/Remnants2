@@ -23,6 +23,7 @@ class MainState extends FlxState
 
 		FlxG.gamepads.globalDeadZone = .8;
 
+		Reg.currentLevel = 1;
 		FlxG.switchState(new GameState());
 	}
 }

@@ -3,9 +3,11 @@ package game;
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxObject;
+import flixel.FlxSprite;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
+import flixel.util.FlxColor;
 import game.Door;
 import game.Key;
 import mintDungeon.Generator;
@@ -18,9 +20,14 @@ class GameState extends flixel.FlxState
 
 	private var _console:Console;
 	private var _map:FlxTilemap;
+
 	private var _playerGroup:FlxTypedGroup<Player>;
 	private var _doorGroup:FlxTypedGroup<game.Door>;
 	private var _keyGroup:FlxTypedGroup<game.Key>;
+	private var _exit:FlxSprite;
+
+	private var _frameCount:Int = 0;
+	private var _winning:Bool;
 
 	public function new()
 	{
@@ -38,6 +45,8 @@ class GameState extends flixel.FlxState
 		setupVars();
 		setupConsole();
 		_console.exec("autoexecgame");
+
+		FlxG.camera.fade(0xFF000000, 1, true, null, true);
 	}
 
 	private function setupVars():Void
@@ -46,6 +55,7 @@ class GameState extends flixel.FlxState
 		_doorGroup = new FlxTypedGroup<game.Door>();
 		_keyGroup = new FlxTypedGroup<game.Key>();
 		Inputs.players = _playerGroup;
+		_winning = false;
 		
 		generator = new Generator(0);
 	}
@@ -54,6 +64,7 @@ class GameState extends flixel.FlxState
 	{
 		_console = new Console();
 		_console.passInReference("G", this);
+		_console.passInReference("R", Reg);
 		add(_console);
 	}
 
@@ -82,6 +93,12 @@ class GameState extends flixel.FlxState
 			_keyGroup.add(k);
 			add(k);
 		}
+
+		_exit = new FlxSprite();
+		_exit.makeGraphic(10, 20, FlxColor.YELLOW);
+		_exit.x = generator.exitPoint.x * Reg.TILE_SIZE - _exit.width / 2 + Reg.TILE_SIZE / 2;
+		_exit.y = generator.exitPoint.y * Reg.TILE_SIZE - _exit.height / 2 + Reg.TILE_SIZE / 2;
+		add(_exit);
 	}
 
 	private function createPlayer(model:Int, xpos:Float = -1, ypos:Float = -1):Void
@@ -97,8 +114,11 @@ class GameState extends flixel.FlxState
 
 	override public function update(elapsed:Float):Void
 	{
+		_frameCount++;
+
 		Inputs.update();
 		updateCamera();
+		updateExit();
 
 		super.update(elapsed);
 		
@@ -126,6 +146,25 @@ class GameState extends flixel.FlxState
 		FlxG.overlap(_keyGroup, _playerGroup, keyVSPlayer);
 		FlxG.collide(_doorGroup, _playerGroup, doorVSPlayer);
 		FlxG.collide(_map, _playerGroup);
+	}
+
+	private function updateExit():Void
+	{
+		if (_frameCount % 60 != 0 || _winning) return;
+
+		var _playersOn:Int = 0;
+		var _playersAlive:Int = 0;
+
+		for (i in _playerGroup) if (i.alive && !FlxG.overlap(i, _exit)) return;
+
+		_winning = true;
+		FlxG.camera.fade(0xFF000000, 2, false, nextLevel);
+	}
+
+	private function nextLevel():Void
+	{
+		Reg.currentLevel++;
+		FlxG.resetState();
 	}
 
 	private function keyVSPlayer(b1:FlxBasic, b2:FlxBasic):Void
