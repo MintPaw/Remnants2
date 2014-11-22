@@ -19,22 +19,6 @@ class Inputs
 	public static var X:Int;
 	public static var Y:Int;
 
-	public static var actions:Array<String> = 
-	[
-	"moveLeft0", 
-	"moveRight0", 
-	"moveUp0", 
-	"moveDown0", 
-	"moveLeft1", 
-	"moveRight1", 
-	"moveUp1", 
-	"moveDown1",
-	"attackDown0",
-	"attackUp0",
-	"attackDown1",
-	"attackUp1"
-	];
-
 	public function new()
 	{
 
@@ -64,7 +48,7 @@ class Inputs
 
 		//for (i in FlxG.keys.justPressed) commands.push(i.ID + "_pressed");
 		//for (i in FlxG.keys.justReleased) commands.push(i.ID + "_released");
-		
+
 		for (i in FlxG.keys.getIsDown()) commands.push(i.ID);
 
 		for (i in 0...4)
@@ -112,6 +96,7 @@ class Inputs
 					if (binds.get(i).indexOf("moveUp") != -1) players.members[p].move(FlxObject.UP);
 					if (binds.get(i).indexOf("moveDown") != -1) players.members[p].move(FlxObject.DOWN);
 					if (binds.get(i).indexOf("attack") != -1) players.members[p].move(FlxObject.DOWN);
+					if (binds.get(i).indexOf("spell") != -1) players.members[p].castSpell(Std.parseInt(binds.get(i).charAt(binds.get(i).length - 2)));
 				}
 			}
 		}

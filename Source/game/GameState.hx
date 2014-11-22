@@ -44,6 +44,7 @@ class GameState extends flixel.FlxState
 	{
 		setupVars();
 		setupConsole();
+		_console.exec("defaultBinding");
 		_console.exec("autoexecgame");
 
 		FlxG.camera.fade(0xFF000000, 1, true, null, true);
