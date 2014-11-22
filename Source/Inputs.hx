@@ -28,7 +28,11 @@ class Inputs
 	"moveLeft1", 
 	"moveRight1", 
 	"moveUp1", 
-	"moveDown1"
+	"moveDown1",
+	"attackDown0",
+	"attackUp0",
+	"attackDown1",
+	"attackUp1"
 	];
 
 	public function new()
@@ -58,6 +62,9 @@ class Inputs
 	{
 		var commands:Array<String> = [];
 
+		//for (i in FlxG.keys.justPressed) commands.push(i.ID + "_pressed");
+		//for (i in FlxG.keys.justReleased) commands.push(i.ID + "_released");
+		
 		for (i in FlxG.keys.getIsDown()) commands.push(i.ID);
 
 		for (i in 0...4)
@@ -75,10 +82,20 @@ class Inputs
 				if (pad.getYAxis(RIGHT_STICK) < 0) commands.push("pad"+i+"RSup");
 				if (pad.getYAxis(RIGHT_STICK) > 0) commands.push("pad"+i+"RSdown");
 
-				if (pad.justReleased(A)) commands.push("pad"+i+"A");
-				if (pad.justReleased(B)) commands.push("pad"+i+"B");
-				if (pad.justReleased(X)) commands.push("pad"+i+"X");
-				if (pad.justReleased(Y)) commands.push("pad"+i+"Y");
+				if (pad.pressed(A)) commands.push("pad"+i+"A");
+				if (pad.pressed(B)) commands.push("pad"+i+"B");
+				if (pad.pressed(X)) commands.push("pad"+i+"X");
+				if (pad.pressed(Y)) commands.push("pad"+i+"Y");
+
+				if (pad.justPressed(A)) commands.push("pad"+i+"A_pressed");
+				if (pad.justPressed(B)) commands.push("pad"+i+"B_pressed");
+				if (pad.justPressed(X)) commands.push("pad"+i+"X_pressed");
+				if (pad.justPressed(Y)) commands.push("pad"+i+"Y_pressed");
+
+				if (pad.justReleased(A)) commands.push("pad"+i+"A_released");
+				if (pad.justReleased(B)) commands.push("pad"+i+"B_released");
+				if (pad.justReleased(X)) commands.push("pad"+i+"X_released");
+				if (pad.justReleased(Y)) commands.push("pad"+i+"Y_released");
 			}
 		}
 
@@ -94,6 +111,7 @@ class Inputs
 					if (binds.get(i).indexOf("moveRight") != -1) players.members[p].move(FlxObject.RIGHT);
 					if (binds.get(i).indexOf("moveUp") != -1) players.members[p].move(FlxObject.UP);
 					if (binds.get(i).indexOf("moveDown") != -1) players.members[p].move(FlxObject.DOWN);
+					if (binds.get(i).indexOf("attack") != -1) players.members[p].move(FlxObject.DOWN);
 				}
 			}
 		}
